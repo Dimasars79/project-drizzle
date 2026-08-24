@@ -85,7 +85,7 @@ export function TransactionsTable({
                 const amount = Number(tx.amount);
                 return (
                   <tr key={tx.id} className="hover:bg-muted/50 transition-colors">
-                    <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{tx.date.toLocaleDateString()}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{tx.date.toLocaleDateString('en-GB')}</td>
                     <td className="px-6 py-4 font-medium">{tx.description}</td>
                     <td className="px-6 py-4">
                       <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-muted/50 text-foreground">

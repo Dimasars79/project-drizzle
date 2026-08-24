@@ -32,48 +32,70 @@ export const TransactionStatement = forwardRef<HTMLDivElement, TransactionStatem
     return (
       <div 
         ref={ref}
-        className="bg-white text-black p-10 w-[794px] min-h-[1123px] relative mx-auto" 
+        className="bg-[#ffffff] text-[#000000] p-10 w-[794px] min-h-[1123px] relative mx-auto pdf-container" 
         style={{ fontFamily: 'sans-serif' }}
       >
+        <style dangerouslySetInnerHTML={{__html: `
+          .pdf-container * {
+            border-color: #e5e7eb;
+            outline-color: transparent;
+            box-shadow: none;
+            --tw-border-opacity: 1;
+            --tw-bg-opacity: 1;
+            --tw-text-opacity: 1;
+            --tw-shadow: 0 0 #0000;
+            --tw-shadow-colored: 0 0 #0000;
+            --tw-ring-color: transparent;
+            --tw-border-spacing-x: 0;
+            --tw-border-spacing-y: 0;
+            --tw-translate-x: 0;
+            --tw-translate-y: 0;
+            --tw-rotate: 0;
+            --tw-skew-x: 0;
+            --tw-skew-y: 0;
+            --tw-scale-x: 1;
+            --tw-scale-y: 1;
+          }
+        `}} />
         {/* Header Kop Surat */}
-        <div className="flex justify-between items-end border-b-2 border-primary/20 pb-6 mb-8">
+        <div className="flex justify-between items-end border-b-2 border-[#e0e7ff] pb-6 mb-8">
           <div>
-            <h1 className="text-4xl font-black text-primary tracking-tighter">MONEY<span className="text-black">APP</span></h1>
-            <p className="text-gray-500 text-sm mt-1">Smart Financial Management</p>
+            <h1 className="text-4xl font-black text-[#4f46e5] tracking-tighter">MONEY<span className="text-[#000000]">APP</span></h1>
+            <p className="text-[#6b7280] text-sm mt-1">Smart Financial Management</p>
           </div>
           <div className="text-right">
-            <h2 className="text-2xl font-bold text-gray-800">Bank Statement</h2>
-            <p className="text-sm text-gray-500 mt-1">Ref: STM-{Math.floor(Math.random() * 1000000)}</p>
+            <h2 className="text-2xl font-bold text-[#1f2937]">Bank Statement</h2>
+            <p className="text-sm text-[#6b7280] mt-1">Ref: STM-{Math.floor(Math.random() * 1000000)}</p>
           </div>
         </div>
 
         {/* Informasi Pelanggan dan Periode */}
-        <div className="flex justify-between mb-10 bg-gray-50 p-6 rounded-lg border border-gray-100">
+        <div className="flex justify-between mb-10 bg-[#f9fafb] p-6 rounded-lg border border-[#f3f4f6]">
           <div>
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Informasi Akun</h3>
-            <p className="font-bold text-gray-800 text-lg">{userName}</p>
-            <p className="text-gray-500 text-sm">{userEmail}</p>
+            <h3 className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-2">Informasi Akun</h3>
+            <p className="font-bold text-[#1f2937] text-lg">{userName}</p>
+            <p className="text-[#6b7280] text-sm">{userEmail}</p>
           </div>
           <div className="text-right">
-            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Periode Laporan</h3>
-            <p className="font-medium text-gray-800">{periodStart} - {periodEnd}</p>
-            <p className="text-gray-400 text-xs mt-1">Dicetak pada: {printDate}</p>
+            <h3 className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-2">Periode Laporan</h3>
+            <p className="font-medium text-[#1f2937]">{periodStart} - {periodEnd}</p>
+            <p className="text-[#9ca3af] text-xs mt-1">Dicetak pada: {printDate}</p>
           </div>
         </div>
 
         {/* Ringkasan Finansial */}
         <div className="grid grid-cols-3 gap-4 mb-10">
-          <div className="bg-white border-l-4 border-success p-4 shadow-sm">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pemasukan</p>
-            <p className="text-xl font-bold text-success">{formatRupiah(totalIncome)}</p>
+          <div className="bg-[#ffffff] border-l-4 border-[#10b981] p-4" style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+            <p className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-1">Total Pemasukan</p>
+            <p className="text-xl font-bold text-[#10b981]">{formatRupiah(totalIncome)}</p>
           </div>
-          <div className="bg-white border-l-4 border-destructive p-4 shadow-sm">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Pengeluaran</p>
-            <p className="text-xl font-bold text-destructive">{formatRupiah(totalExpenses)}</p>
+          <div className="bg-[#ffffff] border-l-4 border-[#ef4444] p-4" style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+            <p className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-1">Total Pengeluaran</p>
+            <p className="text-xl font-bold text-[#ef4444]">{formatRupiah(totalExpenses)}</p>
           </div>
-          <div className="bg-white border-l-4 border-blue-500 p-4 shadow-sm">
-            <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Saldo Bersih</p>
-            <p className={`text-xl font-bold ${netBalance >= 0 ? 'text-gray-800' : 'text-destructive'}`}>
+          <div className="bg-[#ffffff] border-l-4 border-[#3b82f6] p-4" style={{ boxShadow: '0 1px 2px 0 rgba(0, 0, 0, 0.05)' }}>
+            <p className="text-xs font-bold text-[#9ca3af] uppercase tracking-wider mb-1">Saldo Bersih</p>
+            <p className={`text-xl font-bold ${netBalance >= 0 ? 'text-[#1f2937]' : 'text-[#ef4444]'}`}>
               {formatRupiah(netBalance)}
             </p>
           </div>
@@ -81,10 +103,10 @@ export const TransactionStatement = forwardRef<HTMLDivElement, TransactionStatem
 
         {/* Tabel Transaksi */}
         <div className="mb-10">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Rincian Transaksi</h3>
+          <h3 className="text-lg font-bold text-[#1f2937] mb-4 border-b pb-2">Rincian Transaksi</h3>
           <table className="w-full text-left text-sm">
             <thead>
-              <tr className="bg-gray-100 text-gray-600">
+              <tr className="bg-[#f3f4f6] text-[#4b5563]">
                 <th className="py-3 px-4 font-semibold rounded-tl-lg">Tanggal</th>
                 <th className="py-3 px-4 font-semibold">Deskripsi</th>
                 <th className="py-3 px-4 font-semibold">Kategori</th>
@@ -97,13 +119,13 @@ export const TransactionStatement = forwardRef<HTMLDivElement, TransactionStatem
                   const amt = Number(tx.amount);
                   const isIncome = amt > 0;
                   return (
-                    <tr key={tx.id || idx} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="py-3 px-4 text-gray-600 whitespace-nowrap">
+                    <tr key={tx.id || idx} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors">
+                      <td className="py-3 px-4 text-[#4b5563] whitespace-nowrap">
                         {tx.date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                       </td>
-                      <td className="py-3 px-4 font-medium text-gray-800">{tx.description}</td>
-                      <td className="py-3 px-4 text-gray-500">{tx.categoryName || '-'}</td>
-                      <td className={`py-3 px-4 font-bold text-right ${isIncome ? 'text-success' : 'text-gray-800'}`}>
+                      <td className="py-3 px-4 font-medium text-[#1f2937]">{tx.description}</td>
+                      <td className="py-3 px-4 text-[#6b7280]">{tx.categoryName || '-'}</td>
+                      <td className={`py-3 px-4 font-bold text-right ${isIncome ? 'text-[#10b981]' : 'text-[#1f2937]'}`}>
                         {isIncome ? '+' : ''}{formatRupiah(Math.abs(amt))}
                       </td>
                     </tr>
@@ -111,7 +133,7 @@ export const TransactionStatement = forwardRef<HTMLDivElement, TransactionStatem
                 })
               ) : (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-gray-400 font-medium">
+                  <td colSpan={4} className="py-8 text-center text-[#9ca3af] font-medium">
                     Tidak ada transaksi pada periode ini.
                   </td>
                 </tr>
@@ -121,8 +143,8 @@ export const TransactionStatement = forwardRef<HTMLDivElement, TransactionStatem
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-10 left-10 right-10 pt-6 border-t border-gray-200">
-          <div className="flex justify-between items-center text-xs text-gray-400">
+        <div className="absolute bottom-10 left-10 right-10 pt-6 border-t border-[#e5e7eb]">
+          <div className="flex justify-between items-center text-xs text-[#9ca3af]">
             <p>Laporan ini dicetak secara otomatis oleh sistem MoneyApp.</p>
             <p>Halaman 1 dari 1</p>
           </div>

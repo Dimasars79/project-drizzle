@@ -6,6 +6,7 @@ async function seed() {
   const { db } = await import("./index");
   const { users, accounts, categories, transactions } = await import("./schema");
   const { eq } = await import("drizzle-orm");
+  const bcrypt = await import("bcryptjs");
 
   console.log("Memulai proses seeding...");
 
@@ -14,9 +15,11 @@ async function seed() {
     let user = (await db.select().from(users).limit(1))[0];
     if (!user) {
       console.log("Membuat user baru...");
+      const hashedPassword = await bcrypt.hash("password123", 10);
       const result = await db.insert(users).values({
         name: "Budi Santoso",
         email: "budi.santoso@example.com",
+        password: hashedPassword,
       }).returning();
       user = result[0];
     }

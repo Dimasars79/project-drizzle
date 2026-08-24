@@ -1,18 +1,25 @@
 "use client";
 
-import { useState } from "react";
-import { User, Bell, Shield, Smartphone, Monitor } from "lucide-react";
+import { useState, useEffect } from "react";
+import { User, Shield, Monitor, Download } from "lucide-react";
+import { useTheme } from "next-themes";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Profile");
+  const { theme, setTheme, systemTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Prevent hydration mismatch
+  useEffect(() => setMounted(true), []);
 
   const tabs = [
     { id: "Profile", icon: User },
     { id: "Security", icon: Shield },
-    { id: "Notifications", icon: Bell },
-    { id: "Connected Apps", icon: Smartphone },
     { id: "Appearance", icon: Monitor },
+    { id: "Data Export", icon: Download },
   ];
+
+  const currentTheme = theme === 'system' ? systemTheme : theme;
 
   return (
     <div className="space-y-8">
@@ -126,7 +133,7 @@ export default function Settings() {
             </div>
           )}
 
-          {activeTab === "Appearance" && (
+          {activeTab === "Appearance" && mounted && (
             <div className="rounded-xl border bg-card shadow-sm">
               <div className="p-6 border-b">
                 <h3 className="text-lg font-semibold tracking-tight">Appearance</h3>
@@ -138,17 +145,41 @@ export default function Settings() {
                     <label className="text-sm font-medium leading-none">Dark Mode</label>
                     <p className="text-sm text-muted-foreground">Toggle dark mode theme.</p>
                   </div>
-                  <div className="relative inline-flex h-6 w-11 items-center rounded-full bg-muted border cursor-pointer">
-                    <span className="inline-block h-4 w-4 transform rounded-full bg-muted-foreground transition" />
-                  </div>
+                  <button 
+                    onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors ${
+                      currentTheme === 'dark' ? 'bg-primary' : 'bg-muted'
+                    }`}
+                  >
+                    <span 
+                      className={`inline-block h-4 w-4 transform rounded-full bg-background shadow-sm transition-transform ${
+                        currentTheme === 'dark' ? 'translate-x-6' : 'translate-x-1'
+                      }`} 
+                    />
+                  </button>
                 </div>
               </div>
             </div>
           )}
 
-          {["Notifications", "Connected Apps"].includes(activeTab) && (
-            <div className="rounded-xl border bg-card shadow-sm p-12 text-center text-muted-foreground">
-              <p>Pengaturan untuk <strong>{activeTab}</strong> akan segera hadir di versi mendatang.</p>
+          {activeTab === "Data Export" && (
+            <div className="rounded-xl border bg-card shadow-sm">
+              <div className="p-6 border-b">
+                <h3 className="text-lg font-semibold tracking-tight">Data Export</h3>
+                <p className="text-sm text-muted-foreground mt-1">Download your personal financial data.</p>
+              </div>
+              <div className="p-6 space-y-6">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-0.5">
+                    <label className="text-sm font-medium leading-none">Export All Transactions</label>
+                    <p className="text-sm text-muted-foreground">Download a CSV file containing all your transaction history.</p>
+                  </div>
+                  <button className="flex items-center gap-2 rounded-md border bg-card px-4 py-2 text-sm font-medium hover:bg-muted transition-colors whitespace-nowrap">
+                    <Download className="h-4 w-4" />
+                    Download CSV
+                  </button>
+                </div>
+              </div>
             </div>
           )}
         </main>

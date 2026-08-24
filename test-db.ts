@@ -15,15 +15,16 @@ async function testConnection() {
   try {
     // 1. Uji coba menambahkan pengguna baru (Insert)
     console.log("Menambahkan user percobaan...");
-    const newUser = await db.insert(users).values({
-      name: "Budi Santoso",
-      email: `budi.${Date.now()}@example.com`,
+    const result = await db.insert(users).values({
+      name: "Test User",
+      email: "test@example.com",
+      password: "testpassword",
     }).returning();
     
-    console.log("Berhasil menambahkan user:", newUser[0]);
+    console.log("Insert berhasil! User ID:", result[0].id);
 
     // 2. Uji coba mengambil data (Select)
-    console.log("Mengambil daftar user dari database...");
+    console.log("\n2. Mengambil data user...");
     const allUsers = await db.select().from(users);
     
     console.log(`Berhasil! Terdapat ${allUsers.length} user di database:`);

@@ -2,14 +2,18 @@ import { ArrowDownIcon, ArrowUpIcon, CreditCard, DollarSign } from "lucide-react
 import { DashboardChart } from "@/components/DashboardChart";
 import { db } from "@/db";
 import { users, accounts, transactions, categories } from "@/db/schema";
-import { desc, eq, sum } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
-  // Dalam skenario asli dengan Auth, kita ambil user.id yang sedang login
-  const currentUser = (await db.select().from(users).limit(1))[0];
+  const session = await getSession();
+  if (!session?.userId) redirect("/login");
+
+  const currentUser = (await db.select().from(users).where(eq(users.id, session.userId)).limit(1))[0];
 
   if (!currentUser) {
-    return <div>User tidak ditemukan. Silakan jalankan seeding.</div>;
+    return <div>User tidak ditemukan.</div>;
   }
 
   // Ambil saldo total (sum dari balance semua akun)

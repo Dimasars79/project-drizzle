@@ -2,12 +2,17 @@ import { CreditCard, Landmark, Wallet, Plus, MoreVertical, ArrowUpRight } from "
 import { db } from "@/db";
 import { users, accounts } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function Accounts() {
-  const currentUser = (await db.select().from(users).limit(1))[0];
+  const session = await getSession();
+  if (!session?.userId) redirect("/login");
+
+  const currentUser = (await db.select().from(users).where(eq(users.id, session.userId)).limit(1))[0];
 
   if (!currentUser) {
-    return <div>User tidak ditemukan. Silakan jalankan seeding.</div>;
+    return <div>User tidak ditemukan.</div>;
   }
 
   const accountsData = await db.select().from(accounts).where(eq(accounts.userId, currentUser.id));

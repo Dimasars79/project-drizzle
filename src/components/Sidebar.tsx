@@ -25,8 +25,14 @@ const navItems = [
   { name: "Settings", href: "/settings", icon: Settings },
 ];
 
-export function Sidebar() {
+import { logoutUser } from "@/actions/auth";
+import { LogOut } from "lucide-react";
+
+export function Sidebar({ userName = "John Doe" }: { userName?: string }) {
   const pathname = usePathname();
+  
+  // Ambil inisial nama
+  const initials = userName.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase();
 
   return (
     <div className="flex h-screen w-64 flex-col border-r bg-card text-card-foreground">
@@ -54,15 +60,24 @@ export function Sidebar() {
           );
         })}
       </nav>
-      <div className="p-4 border-t">
-        <div className="flex items-center gap-3 rounded-lg bg-muted p-3">
-          <div className="h-9 w-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
-            JD
+      <div className="p-4 border-t flex flex-col gap-2">
+        <div className="flex items-center justify-between rounded-lg bg-muted p-3">
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+              {initials}
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-semibold truncate max-w-[100px]">{userName}</span>
+              <span className="text-xs text-muted-foreground">User</span>
+            </div>
           </div>
-          <div className="flex flex-col">
-            <span className="text-sm font-semibold">John Doe</span>
-            <span className="text-xs text-muted-foreground">Free Plan</span>
-          </div>
+          <button 
+            onClick={() => logoutUser()}
+            className="p-2 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+            title="Keluar"
+          >
+            <LogOut className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>

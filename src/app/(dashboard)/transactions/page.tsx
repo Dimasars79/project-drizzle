@@ -2,13 +2,17 @@ import { db } from "@/db";
 import { users, transactions, categories } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { TransactionsTable } from "@/components/TransactionsTable";
+import { getSession } from "@/lib/auth";
+import { redirect } from "next/navigation";
 
 export default async function TransactionsPage() {
-  // Ambil user.id (mock auth)
-  const currentUser = (await db.select().from(users).limit(1))[0];
+  const session = await getSession();
+  if (!session?.userId) redirect("/login");
+
+  const currentUser = (await db.select().from(users).where(eq(users.id, session.userId)).limit(1))[0];
 
   if (!currentUser) {
-    return <div>User tidak ditemukan. Silakan jalankan seeding.</div>;
+    return <div>User tidak ditemukan.</div>;
   }
 
   // Fetch semua transaksi

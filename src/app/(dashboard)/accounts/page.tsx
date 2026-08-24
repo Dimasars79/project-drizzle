@@ -1,10 +1,11 @@
-import { CreditCard, Landmark, Wallet, Plus, MoreVertical, ArrowUpRight } from "lucide-react";
+import { CreditCard, Landmark, Wallet, Plus, MoreVertical, MoreHorizontal, ArrowUpRight, ArrowDownRight, PiggyBank } from "lucide-react";
 import { db } from "@/db";
 import { users, accounts } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AddAccountModal } from "@/components/modals/AddAccountModal";
+import { formatRupiah } from "@/lib/format";
 
 export default async function Accounts() {
   const session = await getSession();
@@ -59,14 +60,14 @@ export default async function Accounts() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {allAccounts.length === 0 ? (
+        {accountsData.length === 0 ? (
           <div className="col-span-full rounded-xl border bg-card shadow-sm p-12 text-center text-muted-foreground">
             <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
             <p className="text-lg font-medium">Belum ada akun</p>
             <p className="text-sm">Tambahkan akun bank atau dompet pertama Anda.</p>
           </div>
         ) : (
-          allAccounts.map((account) => {
+          accountsData.map((account) => {
             const isNegative = Number(account.balance) < 0;
             return (
               <div key={account.id} className="rounded-xl border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow group">

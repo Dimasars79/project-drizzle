@@ -7,7 +7,7 @@ import { DataExportSettings } from "@/components/DataExportSettings";
 import { ProfileSettings } from "@/components/ProfileSettings";
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Profile");
-  const { theme, setTheme, systemTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   // Prevent hydration mismatch
@@ -19,8 +19,6 @@ export default function Settings() {
     { id: "Appearance", icon: Monitor },
     { id: "Data Export", icon: Download },
   ];
-
-  const currentTheme = theme === 'system' ? systemTheme : theme;
 
   return (
     <div className="space-y-8">
@@ -131,14 +129,6 @@ export default function Settings() {
                       }`}
                     >
                       Dark Mode
-                    </button>
-                    <button 
-                      onClick={() => setTheme('system')}
-                      className={`flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
-                        theme === 'system' ? 'border-primary bg-primary/10 text-primary' : 'bg-card hover:bg-muted'
-                      }`}
-                    >
-                      System
                     </button>
                   </div>
                 </div>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { User, Shield, Monitor, Download } from "lucide-react";
-import { useTheme } from "next-themes";
+import { useTheme } from "@/components/ThemeProvider";
 
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Profile");

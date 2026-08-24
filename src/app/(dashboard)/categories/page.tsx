@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AddCategoryModal } from "@/components/modals/AddCategoryModal";
-
+import { formatRupiah } from "@/lib/format";
 export default async function Categories() {
   const session = await getSession();
   if (!session?.userId) redirect("/login");

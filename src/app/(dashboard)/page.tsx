@@ -7,6 +7,8 @@ import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { AddTransactionModal } from "@/components/modals/AddTransactionModal";
 
+import { formatRupiah } from "@/lib/format";
+
 export default async function Dashboard() {
   const session = await getSession();
   if (!session?.userId) redirect("/login");
@@ -64,9 +66,9 @@ export default async function Dashboard() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card title="Total Balance" amount={`$${totalBalance.toFixed(2)}`} icon={<DollarSign />} trend="+0.0% from last month" trendUp />
-        <Card title="Total Income" amount={`$${totalIncome.toFixed(2)}`} icon={<ArrowUpIcon className="text-success" />} trend="Current Month" trendUp />
-        <Card title="Total Expenses" amount={`$${totalExpenses.toFixed(2)}`} icon={<ArrowDownIcon className="text-destructive" />} trend="Current Month" trendUp={false} />
+        <Card title="Total Balance" amount={formatRupiah(totalBalance)} icon={<DollarSign />} trend="+0.0% from last month" trendUp />
+        <Card title="Total Income" amount={formatRupiah(totalIncome)} icon={<ArrowUpIcon className="text-success" />} trend="Current Month" trendUp />
+        <Card title="Total Expenses" amount={formatRupiah(totalExpenses)} icon={<ArrowDownIcon className="text-destructive" />} trend="Current Month" trendUp={false} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-7">
@@ -92,22 +94,25 @@ export default async function Dashboard() {
             {allTransactions.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">Belum ada transaksi.</p>
             ) : (
-              allTransactions.slice(0, 5).map((tx) => (
-                <div key={tx.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                      <CreditCard className="h-5 w-5 text-muted-foreground" />
+              allTransactions.slice(0, 5).map((tx) => {
+                const amount = Number(tx.amount);
+                return (
+                  <div key={tx.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                        <CreditCard className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium leading-none">{tx.description}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{tx.categoryName || "Uncategorized"} • {tx.date.toLocaleDateString()}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-sm font-medium leading-none">{tx.description}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{tx.categoryName || "Uncategorized"} • {tx.date.toLocaleDateString()}</p>
+                    <div className={`font-semibold ${amount > 0 ? 'text-success' : ''}`}>
+                      {amount > 0 ? '+' : ''}{amount < 0 ? '-' : ''}{formatRupiah(Math.abs(amount))}
                     </div>
                   </div>
-                  <div className={`font-semibold ${Number(tx.amount) > 0 ? 'text-success' : ''}`}>
-                    {Number(tx.amount) > 0 ? '+' : ''}{Number(tx.amount) < 0 ? '-' : ''}${Math.abs(Number(tx.amount)).toFixed(2)}
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>

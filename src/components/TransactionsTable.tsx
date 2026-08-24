@@ -16,6 +16,8 @@ type Transaction = {
 type Account = { id: string; name: string };
 type Category = { id: string; name: string };
 
+import { formatRupiah } from "@/lib/format";
+
 export function TransactionsTable({ 
   data, 
   accounts, 
@@ -81,32 +83,35 @@ export function TransactionsTable({
               </tr>
             </thead>
             <tbody className="divide-y">
-              {filteredTransactions.map((tx) => (
-                <tr key={tx.id} className="hover:bg-muted/50 transition-colors">
-                  <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{tx.date.toLocaleDateString()}</td>
-                  <td className="px-6 py-4 font-medium">{tx.description}</td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-muted/50 text-foreground">
-                      {tx.category}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
-                      tx.status === 'Completed' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
-                    }`}>
-                      {tx.status}
-                    </span>
-                  </td>
-                  <td className={`px-6 py-4 text-right font-medium whitespace-nowrap ${Number(tx.amount) > 0 ? 'text-success' : ''}`}>
-                    {Number(tx.amount) > 0 ? '+' : ''}{Number(tx.amount) < 0 ? '-' : ''}${Math.abs(Number(tx.amount)).toFixed(2)}
-                  </td>
-                  <td className="px-6 py-4 text-center">
-                    <button className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted">
-                      <MoreHorizontal className="h-4 w-4" />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {filteredTransactions.map((tx) => {
+                const amount = Number(tx.amount);
+                return (
+                  <tr key={tx.id} className="hover:bg-muted/50 transition-colors">
+                    <td className="px-6 py-4 whitespace-nowrap text-muted-foreground">{tx.date.toLocaleDateString()}</td>
+                    <td className="px-6 py-4 font-medium">{tx.description}</td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold bg-muted/50 text-foreground">
+                        {tx.category}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${
+                        tx.status === 'Completed' ? 'bg-success/10 text-success' : 'bg-warning/10 text-warning'
+                      }`}>
+                        {tx.status}
+                      </span>
+                    </td>
+                    <td className={`px-6 py-4 text-right font-medium whitespace-nowrap ${amount > 0 ? 'text-success' : ''}`}>
+                      {amount > 0 ? '+' : ''}{amount < 0 ? '-' : ''}{formatRupiah(Math.abs(amount))}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-muted">
+                        <MoreHorizontal className="h-4 w-4" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
               {filteredTransactions.length === 0 && (
                 <tr>
                   <td colSpan={6} className="px-6 py-12 text-center text-muted-foreground">

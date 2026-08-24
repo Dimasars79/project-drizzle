@@ -47,7 +47,7 @@ export default async function Categories() {
     return {
       id: cat.id,
       name: cat.name,
-      icon: getIconForName(cat.icon),
+      icon: cat.icon,
       color: cat.color || "bg-muted",
       spent: spent,
       budget: Number(cat.budget) || 0,
@@ -73,12 +73,24 @@ export default async function Categories() {
           const percentSpent = cat.budget > 0 ? Math.min((cat.spent / cat.budget) * 100, 100) : (cat.spent > 0 ? 100 : 0);
           const isOverBudget = cat.budget > 0 && cat.spent > cat.budget;
 
+          // Pilih icon berdasarkan string
+          let IconComponent = PieChart;
+          if (cat.icon === "ShoppingCart") IconComponent = ShoppingCart;
+          else if (cat.icon === "Coffee") IconComponent = Coffee;
+          else if (cat.icon === "Home") IconComponent = Home;
+          else if (cat.icon === "Car") IconComponent = Car;
+          else if (cat.icon === "Utensils") IconComponent = Utensils;
+          else if (cat.icon === "Film") IconComponent = Film;
+          else if (cat.icon === "HeartPulse") IconComponent = HeartPulse;
+          else if (cat.icon === "ShoppingBag") IconComponent = ShoppingBag;
+          else if (cat.icon === "DollarSign") IconComponent = DollarSign;
+
           return (
             <div key={cat.id} className="rounded-xl border bg-card p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-3">
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl text-white ${cat.color} shadow-sm group-hover:scale-110 transition-transform`}>
-                    {cat.icon}
+                    <IconComponent className="h-5 w-5" />
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">{cat.name}</h3>
@@ -89,8 +101,8 @@ export default async function Categories() {
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm font-medium">
-                  <span className={isOverBudget ? 'text-destructive' : 'text-foreground'}>${cat.spent.toLocaleString('en-US', {minimumFractionDigits: 2})} spent</span>
-                  <span className="text-muted-foreground">${cat.budget.toLocaleString('en-US', {minimumFractionDigits: 2})} budget</span>
+                  <span className={isOverBudget ? 'text-destructive' : 'text-foreground'}>{formatRupiah(cat.spent)} spent</span>
+                  <span className="text-muted-foreground">{formatRupiah(cat.budget)} budget</span>
                 </div>
                 <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
                   <div 
@@ -100,7 +112,7 @@ export default async function Categories() {
                 </div>
                 {isOverBudget && (
                   <p className="text-xs text-destructive mt-1 font-medium text-right">
-                    Over budget by ${(cat.spent - cat.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}
+                    Over budget by {formatRupiah(cat.spent - cat.budget)}
                   </p>
                 )}
               </div>

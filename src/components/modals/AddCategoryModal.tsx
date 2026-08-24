@@ -78,7 +78,7 @@ export function AddCategoryModal() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Bujet Maksimal ($)</label>
+                <label className="text-sm font-medium">Bujet Maksimal (Rp)</label>
                 <input
                   name="budget"
                   type="number"

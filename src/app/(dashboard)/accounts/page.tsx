@@ -22,79 +22,78 @@ export default async function Accounts() {
   const totalLiabilities = accountsData.filter(a => Number(a.balance) < 0).reduce((acc, curr) => acc + Math.abs(Number(curr.balance)), 0);
   const netWorth = totalAssets - totalLiabilities;
 
-  const getIconForType = (type: string) => {
-    switch (type) {
-      case "Checking": return <Landmark className="h-6 w-6" />;
-      case "Savings": return <Wallet className="h-6 w-6" />;
-      case "Credit Card": return <CreditCard className="h-6 w-6" />;
-      default: return <Landmark className="h-6 w-6" />;
-    }
-  };
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Accounts</h1>
           <p className="text-muted-foreground mt-1">
-            Manage your bank accounts and credit cards.
+            Manage your bank accounts, credit cards, and cash wallets.
           </p>
         </div>
         <AddAccountModal />
       </div>
 
-      <div className="grid gap-6 md:grid-cols-3 mb-8">
+      <div className="grid gap-6 md:grid-cols-3">
         <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2">Net Worth</h3>
-          <div className="text-3xl font-bold">${netWorth.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
-          <p className="text-xs text-success mt-2 flex items-center gap-1 font-medium">
-            <ArrowUpRight className="h-3 w-3" />
-            +1.2% this month
-          </p>
+          <div className="flex flex-row items-center justify-between pb-2">
+            <h3 className="tracking-tight text-sm font-medium">Net Worth</h3>
+            <Wallet className="h-4 w-4 text-muted-foreground" />
+          </div>
+          <div className="text-3xl font-bold">{formatRupiah(netWorth)}</div>
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2">Total Assets</h3>
-          <div className="text-3xl font-bold text-success">${totalAssets.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          <div className="flex flex-row items-center justify-between pb-2">
+            <h3 className="tracking-tight text-sm font-medium">Total Assets</h3>
+            <ArrowUpRight className="h-4 w-4 text-success" />
+          </div>
+          <div className="text-3xl font-bold text-success">{formatRupiah(totalAssets)}</div>
         </div>
         <div className="rounded-xl border bg-card p-6 shadow-sm">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2">Total Liabilities</h3>
-          <div className="text-3xl font-bold text-destructive">${totalLiabilities.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          <div className="flex flex-row items-center justify-between pb-2">
+            <h3 className="tracking-tight text-sm font-medium">Total Liabilities</h3>
+            <ArrowDownRight className="h-4 w-4 text-destructive" />
+          </div>
+          <div className="text-3xl font-bold text-destructive">{formatRupiah(totalLiabilities)}</div>
         </div>
       </div>
 
-      <h2 className="text-xl font-semibold tracking-tight mt-8 mb-4">Your Connected Accounts</h2>
-      <div className="grid gap-6 md:grid-cols-2">
-        {accountsData.map((account) => (
-          <div key={account.id} className="rounded-xl border bg-card p-0 shadow-sm overflow-hidden flex flex-col group">
-            <div className="p-6 flex-1">
-              <div className="flex justify-between items-start mb-6">
-                <div className="flex items-center gap-4">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${account.color || 'bg-muted'}`}>
-                    {getIconForType(account.type)}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-lg">{account.name}</h3>
-                    <p className="text-sm text-muted-foreground">{account.type}</p>
-                  </div>
-                </div>
-                <button className="text-muted-foreground hover:bg-muted p-2 rounded-full transition-colors opacity-0 group-hover:opacity-100">
-                  <MoreVertical className="h-4 w-4" />
-                </button>
-              </div>
-              
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Current Balance</p>
-                <div className={`text-2xl font-bold ${Number(account.balance) < 0 ? 'text-destructive' : 'text-foreground'}`}>
-                  {Number(account.balance) < 0 ? '-' : ''}${Math.abs(Number(account.balance)).toLocaleString('en-US', {minimumFractionDigits: 2})}
-                </div>
-              </div>
-            </div>
-            <div className="bg-muted/30 px-6 py-3 border-t text-xs text-muted-foreground flex justify-between items-center">
-              <span>Updated Just now</span>
-              <button className="text-primary hover:underline font-medium">Sync Now</button>
-            </div>
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {allAccounts.length === 0 ? (
+          <div className="col-span-full rounded-xl border bg-card shadow-sm p-12 text-center text-muted-foreground">
+            <Wallet className="h-12 w-12 mx-auto mb-4 opacity-50" />
+            <p className="text-lg font-medium">Belum ada akun</p>
+            <p className="text-sm">Tambahkan akun bank atau dompet pertama Anda.</p>
           </div>
-        ))}
+        ) : (
+          allAccounts.map((account) => {
+            const isNegative = Number(account.balance) < 0;
+            return (
+              <div key={account.id} className="rounded-xl border bg-card p-6 shadow-sm flex flex-col justify-between hover:shadow-md transition-shadow group">
+                <div className="flex items-start justify-between">
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${account.color || 'bg-muted'}`}>
+                    {account.type === 'Credit Card' ? <CreditCard className="h-6 w-6 text-white" /> :
+                     account.type === 'Savings' ? <PiggyBank className="h-6 w-6 text-white" /> :
+                     <Landmark className="h-6 w-6 text-white" />}
+                  </div>
+                  <button className="text-muted-foreground hover:text-foreground opacity-0 group-hover:opacity-100 transition-opacity">
+                    <MoreHorizontal className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="mt-4 space-y-1">
+                  <h3 className="font-semibold text-lg">{account.name}</h3>
+                  <p className="text-sm text-muted-foreground">{account.type}</p>
+                </div>
+                <div className="mt-6 pt-4 border-t flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Current Balance</span>
+                  <div className={`text-2xl font-bold ${isNegative ? 'text-destructive' : 'text-foreground'}`}>
+                    {isNegative ? '-' : ''}{formatRupiah(Math.abs(Number(account.balance)))}
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
       </div>
     </div>
   );

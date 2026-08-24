@@ -53,7 +53,7 @@ export function AddTransactionModal({ accounts, categories }: { accounts: Accoun
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Nominal ($)</label>
+                <label className="text-sm font-medium">Nominal (Rp)</label>
                 <input
                   name="amount"
                   type="number"

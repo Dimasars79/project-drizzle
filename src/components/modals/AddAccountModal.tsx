@@ -63,7 +63,7 @@ export function AddAccountModal() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium">Saldo Awal ($)</label>
+                <label className="text-sm font-medium">Saldo Awal (Rp)</label>
                 <input
                   name="balance"
                   type="number"

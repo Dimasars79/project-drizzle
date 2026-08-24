@@ -17,6 +17,7 @@ type Account = { id: string; name: string };
 type Category = { id: string; name: string };
 
 import { formatRupiah } from "@/lib/format";
+import { ExportPdfButton } from "./ExportPdfButton";
 
 export function TransactionsTable({ 
   data, 
@@ -44,10 +45,7 @@ export function TransactionsTable({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 rounded-md border bg-card px-4 py-2 text-sm font-medium hover:bg-muted transition-colors">
-            <Download className="h-4 w-4" />
-            Export
-          </button>
+          <ExportPdfButton variant="outline" label="Export PDF" />
           <AddTransactionModal accounts={accounts} categories={categories} />
         </div>
       </div>

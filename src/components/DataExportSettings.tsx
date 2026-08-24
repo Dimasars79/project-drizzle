@@ -1,51 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Download, Loader2, FileText } from "lucide-react";
-import { getExportData } from "@/actions/export";
-import { exportElementToPdf } from "@/lib/exportPdf";
-import { TransactionStatement } from "@/components/pdf/TransactionStatement";
-import { Transaction } from "@/components/pdf/TransactionStatement";
+import { Download } from "lucide-react";
+import { ExportPdfButton } from "@/components/ExportPdfButton";
 
 export function DataExportSettings() {
-  const [isExportingPdf, setIsExportingPdf] = useState(false);
-  const [exportData, setExportData] = useState<any>(null);
-  
-  const handleExportPdf = async () => {
-    try {
-      setIsExportingPdf(true);
-      
-      // Ambil data terbaru dari server
-      const data = await getExportData();
-      
-      // Format data untuk dicocokkan dengan interface TransactionStatement
-      const formattedData = {
-        ...data,
-        transactions: data.transactions.map((tx: any) => ({
-          ...tx,
-          date: new Date(tx.date)
-        }))
-      };
-      
-      setExportData(formattedData);
-      
-      // Beri waktu sejenak agar React selesai render komponen template yang disembunyikan
-      setTimeout(async () => {
-        const success = await exportElementToPdf('pdf-statement-template', `MoneyApp_Statement_${new Date().getTime()}.pdf`);
-        if (!success) {
-          alert('Gagal mengekspor PDF. Silakan coba lagi.');
-        }
-        setIsExportingPdf(false);
-        setExportData(null); // Bersihkan DOM setelah selesai
-      }, 500);
-      
-    } catch (error) {
-      console.error(error);
-      alert('Terjadi kesalahan saat mengambil data.');
-      setIsExportingPdf(false);
-    }
-  };
-
   return (
     <div className="rounded-xl border bg-card shadow-sm">
       <div className="p-6 border-b">
@@ -60,14 +18,7 @@ export function DataExportSettings() {
             <label className="text-sm font-medium leading-none">Export PDF Bank Statement</label>
             <p className="text-sm text-muted-foreground">Unduh laporan transaksi Anda ke dalam format PDF yang rapi layaknya rekening koran.</p>
           </div>
-          <button 
-            onClick={handleExportPdf}
-            disabled={isExportingPdf}
-            className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors whitespace-nowrap disabled:opacity-50"
-          >
-            {isExportingPdf ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
-            {isExportingPdf ? 'Generating PDF...' : 'Download PDF'}
-          </button>
+          <ExportPdfButton />
         </div>
 
         {/* CSV Export Section (Optional) */}
@@ -82,22 +33,6 @@ export function DataExportSettings() {
           </button>
         </div>
       </div>
-
-      {/* Hidden PDF Template Container */}
-      {exportData && (
-        <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}>
-          <div id="pdf-statement-template">
-            <TransactionStatement 
-              userName={exportData.userName}
-              userEmail={exportData.userEmail}
-              transactions={exportData.transactions}
-              totalIncome={exportData.totalIncome}
-              totalExpenses={exportData.totalExpenses}
-              netBalance={exportData.netBalance}
-            />
-          </div>
-        </div>
-      )}
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { User, Shield, Monitor, Download } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
 import { DataExportSettings } from "@/components/DataExportSettings";
+import { ProfileSettings } from "@/components/ProfileSettings";
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Profile");
   const { theme, setTheme, systemTheme } = useTheme();
@@ -56,38 +57,7 @@ export default function Settings() {
         <main className="flex-1 space-y-6">
           {activeTab === "Profile" && (
             <>
-              <div className="rounded-xl border bg-card shadow-sm">
-                <div className="p-6 border-b">
-                  <h3 className="text-lg font-semibold tracking-tight">Profile Information</h3>
-                  <p className="text-sm text-muted-foreground mt-1">Update your account profile details and email address.</p>
-                </div>
-                <div className="p-6 space-y-6">
-                  <div className="grid gap-4 md:grid-cols-2">
-                    <div className="space-y-2">
-                      <label htmlFor="firstName" className="text-sm font-medium leading-none">First Name</label>
-                      <input id="firstName" defaultValue="John" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-                    </div>
-                    <div className="space-y-2">
-                      <label htmlFor="lastName" className="text-sm font-medium leading-none">Last Name</label>
-                      <input id="lastName" defaultValue="Doe" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="email" className="text-sm font-medium leading-none">Email Address</label>
-                    <input id="email" type="email" defaultValue="john.doe@example.com" className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring" />
-                  </div>
-                  <div className="space-y-2">
-                    <label htmlFor="bio" className="text-sm font-medium leading-none">Bio</label>
-                    <textarea id="bio" placeholder="Tell us a little bit about yourself" className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring resize-none"></textarea>
-                    <p className="text-xs text-muted-foreground">This information will be displayed on your public profile.</p>
-                  </div>
-                </div>
-                <div className="p-6 border-t bg-muted/20 flex justify-end">
-                  <button className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
-                    Save Changes
-                  </button>
-                </div>
-              </div>
+              <ProfileSettings />
 
               <div className="rounded-xl border bg-card shadow-sm">
                 <div className="p-6 border-b">

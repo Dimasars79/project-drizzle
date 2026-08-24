@@ -33,27 +33,24 @@ export async function createTransaction(prevState: any, formData: FormData) {
   }
 
   try {
-    // Mulai proses penambahan transaksi
-    await db.transaction(async (tx) => {
-      // 1. Tambahkan ke tabel transaksi
-      await tx.insert(transactions).values({
-        userId: session.userId,
-        accountId: accountId,
-        categoryId: categoryId,
-        amount: amount.toString(),
-        description,
-        date: new Date(),
-      });
-
-      // 2. Perbarui saldo akun
-      const targetAccount = (await tx.select().from(accounts).where(eq(accounts.id, accountId)).limit(1))[0];
-      if (targetAccount) {
-        const newBalance = Number(targetAccount.balance) + amount;
-        await tx.update(accounts)
-          .set({ balance: newBalance.toString() })
-          .where(eq(accounts.id, accountId));
-      }
+    // 1. Tambahkan ke tabel transaksi
+    await db.insert(transactions).values({
+      userId: session.userId,
+      accountId: accountId,
+      categoryId: categoryId,
+      amount: amount.toString(),
+      description,
+      date: new Date(),
     });
+
+    // 2. Perbarui saldo akun
+    const targetAccount = (await db.select().from(accounts).where(eq(accounts.id, accountId)).limit(1))[0];
+    if (targetAccount) {
+      const newBalance = Number(targetAccount.balance) + amount;
+      await db.update(accounts)
+        .set({ balance: newBalance.toString() })
+        .where(eq(accounts.id, accountId));
+    }
 
     revalidatePath("/transactions");
     revalidatePath("/");
@@ -62,6 +59,7 @@ export async function createTransaction(prevState: any, formData: FormData) {
     
     return { success: true };
   } catch (error) {
+    console.error("Error createTransaction:", error);
     return { error: "Terjadi kesalahan saat memproses transaksi." };
   }
 }

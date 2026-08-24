@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { User, Shield, Monitor, Download } from "lucide-react";
 import { useTheme } from "@/components/ThemeProvider";
-
+import { DataExportSettings } from "@/components/DataExportSettings";
 export default function Settings() {
   const [activeTab, setActiveTab] = useState("Profile");
   const { theme, setTheme, systemTheme } = useTheme();
@@ -177,24 +177,7 @@ export default function Settings() {
           )}
 
           {activeTab === "Data Export" && (
-            <div className="rounded-xl border bg-card shadow-sm">
-              <div className="p-6 border-b">
-                <h3 className="text-lg font-semibold tracking-tight">Data Export</h3>
-                <p className="text-sm text-muted-foreground mt-1">Download your personal financial data.</p>
-              </div>
-              <div className="p-6 space-y-6">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div className="space-y-0.5">
-                    <label className="text-sm font-medium leading-none">Export All Transactions</label>
-                    <p className="text-sm text-muted-foreground">Download a CSV file containing all your transaction history.</p>
-                  </div>
-                  <button className="flex items-center gap-2 rounded-md border bg-card px-4 py-2 text-sm font-medium hover:bg-muted transition-colors whitespace-nowrap">
-                    <Download className="h-4 w-4" />
-                    Download CSV
-                  </button>
-                </div>
-              </div>
-            </div>
+            <DataExportSettings />
           )}
         </main>
       </div>

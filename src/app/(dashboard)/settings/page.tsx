@@ -101,9 +101,9 @@ export default function Settings() {
                       <p className="text-sm text-muted-foreground">Select your primary currency.</p>
                     </div>
                     <select className="flex h-10 w-[180px] rounded-md border border-input bg-background px-3 py-2 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring">
+                      <option value="idr">Rupiah (Rp)</option>
                       <option value="usd">USD ($)</option>
                       <option value="eur">EUR (€)</option>
-                      <option value="gbp">GBP (£)</option>
                     </select>
                   </div>
                 </div>
@@ -140,23 +140,37 @@ export default function Settings() {
                 <p className="text-sm text-muted-foreground mt-1">Customize how the app looks.</p>
               </div>
               <div className="p-6 space-y-6">
-                <div className="flex items-center justify-between">
+                <div className="space-y-4">
                   <div className="space-y-0.5">
-                    <label className="text-sm font-medium leading-none">Dark Mode</label>
-                    <p className="text-sm text-muted-foreground">Toggle dark mode theme.</p>
+                    <label className="text-sm font-medium leading-none">Theme Mode</label>
+                    <p className="text-sm text-muted-foreground">Pilih tema terang atau tema gelap.</p>
                   </div>
-                  <button 
-                    onClick={() => setTheme(currentTheme === 'dark' ? 'light' : 'dark')}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full border transition-colors ${
-                      currentTheme === 'dark' ? 'bg-primary' : 'bg-muted'
-                    }`}
-                  >
-                    <span 
-                      className={`inline-block h-4 w-4 transform rounded-full bg-background shadow-sm transition-transform ${
-                        currentTheme === 'dark' ? 'translate-x-6' : 'translate-x-1'
-                      }`} 
-                    />
-                  </button>
+                  <div className="flex flex-wrap gap-3">
+                    <button 
+                      onClick={() => setTheme('light')}
+                      className={`flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                        theme === 'light' ? 'border-primary bg-primary/10 text-primary' : 'bg-card hover:bg-muted'
+                      }`}
+                    >
+                      Light Mode
+                    </button>
+                    <button 
+                      onClick={() => setTheme('dark')}
+                      className={`flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                        theme === 'dark' ? 'border-primary bg-primary/10 text-primary' : 'bg-card hover:bg-muted'
+                      }`}
+                    >
+                      Dark Mode
+                    </button>
+                    <button 
+                      onClick={() => setTheme('system')}
+                      className={`flex items-center justify-center rounded-md border px-4 py-2 text-sm font-medium transition-colors ${
+                        theme === 'system' ? 'border-primary bg-primary/10 text-primary' : 'bg-card hover:bg-muted'
+                      }`}
+                    >
+                      System
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

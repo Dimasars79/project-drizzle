@@ -103,43 +103,63 @@ export const TransactionStatement = forwardRef<HTMLDivElement, TransactionStatem
 
         {/* Tabel Transaksi */}
         <div className="mb-10">
-          <h3 className="text-lg font-bold text-[#1f2937] mb-4 border-b pb-2">Rincian Transaksi</h3>
-          <table className="w-full text-left text-sm">
-            <thead>
-              <tr className="bg-[#f3f4f6] text-[#4b5563]">
-                <th className="py-3 px-4 font-semibold rounded-tl-lg">Tanggal</th>
-                <th className="py-3 px-4 font-semibold">Deskripsi</th>
-                <th className="py-3 px-4 font-semibold">Kategori</th>
-                <th className="py-3 px-4 font-semibold text-right rounded-tr-lg">Nominal</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.length > 0 ? (
-                transactions.map((tx, idx) => {
-                  const amt = Number(tx.amount);
-                  const isIncome = amt > 0;
-                  return (
-                    <tr key={tx.id || idx} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors">
-                      <td className="py-3 px-4 text-[#4b5563] whitespace-nowrap">
-                        {tx.date.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
-                      </td>
-                      <td className="py-3 px-4 font-medium text-[#1f2937]">{tx.description}</td>
-                      <td className="py-3 px-4 text-[#6b7280]">{tx.categoryName || '-'}</td>
-                      <td className={`py-3 px-4 font-bold text-right ${isIncome ? 'text-[#10b981]' : 'text-[#1f2937]'}`}>
-                        {isIncome ? '+' : ''}{formatRupiah(Math.abs(amt))}
-                      </td>
-                    </tr>
-                  );
-                })
-              ) : (
-                <tr>
-                  <td colSpan={4} className="py-8 text-center text-[#9ca3af] font-medium">
-                    Tidak ada transaksi pada periode ini.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+          <h3 className="text-lg font-bold text-[#1f2937] mb-4 border-b pb-2">Rincian Transaksi per Kategori</h3>
+          
+          {transactions.length > 0 ? (
+            Object.entries(
+              transactions.reduce((acc, tx) => {
+                const category = tx.categoryName || 'Lainnya';
+                if (!acc[category]) acc[category] = [];
+                acc[category].push(tx);
+                return acc;
+              }, {} as Record<string, typeof transactions>)
+            ).map(([category, catTransactions]) => {
+              // Hitung subtotal untuk kategori ini
+              const catTotal = catTransactions.reduce((sum, tx) => sum + Number(tx.amount), 0);
+              const isCatIncome = catTotal > 0;
+              
+              return (
+                <div key={category} className="mb-6">
+                  <div className="flex justify-between items-center bg-[#f9fafb] p-3 rounded-t-lg border-b-2 border-[#e5e7eb]">
+                    <h4 className="font-bold text-[#1f2937] text-sm uppercase tracking-wide">{category}</h4>
+                    <span className={`font-bold text-sm ${isCatIncome ? 'text-[#10b981]' : 'text-[#ef4444]'}`}>
+                      Subtotal: {isCatIncome ? '+' : ''}{formatRupiah(Math.abs(catTotal))}
+                    </span>
+                  </div>
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="bg-[#f3f4f6] text-[#4b5563]">
+                        <th className="py-2 px-4 font-semibold w-1/4">Tanggal</th>
+                        <th className="py-2 px-4 font-semibold w-1/2">Deskripsi</th>
+                        <th className="py-2 px-4 font-semibold text-right w-1/4">Nominal</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {catTransactions.map((tx, idx) => {
+                        const amt = Number(tx.amount);
+                        const isIncome = amt > 0;
+                        return (
+                          <tr key={tx.id || idx} className="border-b border-[#f3f4f6] hover:bg-[#f9fafb] transition-colors">
+                            <td className="py-2 px-4 text-[#6b7280] whitespace-nowrap">
+                              {tx.date.toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })}
+                            </td>
+                            <td className="py-2 px-4 font-medium text-[#1f2937]">{tx.description}</td>
+                            <td className={`py-2 px-4 font-semibold text-right ${isIncome ? 'text-[#10b981]' : 'text-[#1f2937]'}`}>
+                              {isIncome ? '+' : ''}{formatRupiah(Math.abs(amt))}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              );
+            })
+          ) : (
+            <div className="py-12 text-center bg-[#f9fafb] rounded-lg border border-[#f3f4f6]">
+              <p className="text-[#9ca3af] font-medium">Tidak ada transaksi pada periode ini.</p>
+            </div>
+          )}
         </div>
 
         {/* Footer */}

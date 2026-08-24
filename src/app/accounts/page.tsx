@@ -1,18 +1,29 @@
-"use client";
+import { CreditCard, Landmark, Wallet, Plus, MoreVertical, ArrowUpRight } from "lucide-react";
+import { db } from "@/db";
+import { users, accounts } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
-import { CreditCard, Landmark, Wallet, Plus, MoreVertical, ArrowUpRight, ArrowDownRight } from "lucide-react";
+export default async function Accounts() {
+  const currentUser = (await db.select().from(users).limit(1))[0];
 
-const accountsData = [
-  { id: 1, name: "Chase Checking", type: "Checking", balance: 4250.80, lastUpdated: "Just now", icon: <Landmark className="h-6 w-6" />, color: "text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400" },
-  { id: 2, name: "Ally Savings", type: "Savings", balance: 12500.00, lastUpdated: "2 hours ago", icon: <Wallet className="h-6 w-6" />, color: "text-emerald-600 bg-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400" },
-  { id: 3, name: "Amex Platinum", type: "Credit Card", balance: -845.30, limit: 15000, lastUpdated: "5 hours ago", icon: <CreditCard className="h-6 w-6" />, color: "text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-400" },
-  { id: 4, name: "Discover Student", type: "Credit Card", balance: -120.50, limit: 2000, lastUpdated: "1 day ago", icon: <CreditCard className="h-6 w-6" />, color: "text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400" },
-];
+  if (!currentUser) {
+    return <div>User tidak ditemukan. Silakan jalankan seeding.</div>;
+  }
 
-export default function Accounts() {
-  const totalAssets = accountsData.filter(a => a.balance > 0).reduce((acc, curr) => acc + curr.balance, 0);
-  const totalLiabilities = accountsData.filter(a => a.balance < 0).reduce((acc, curr) => acc + Math.abs(curr.balance), 0);
+  const accountsData = await db.select().from(accounts).where(eq(accounts.userId, currentUser.id));
+
+  const totalAssets = accountsData.filter(a => Number(a.balance) > 0).reduce((acc, curr) => acc + Number(curr.balance), 0);
+  const totalLiabilities = accountsData.filter(a => Number(a.balance) < 0).reduce((acc, curr) => acc + Math.abs(Number(curr.balance)), 0);
   const netWorth = totalAssets - totalLiabilities;
+
+  const getIconForType = (type: string) => {
+    switch (type) {
+      case "Checking": return <Landmark className="h-6 w-6" />;
+      case "Savings": return <Wallet className="h-6 w-6" />;
+      case "Credit Card": return <CreditCard className="h-6 w-6" />;
+      default: return <Landmark className="h-6 w-6" />;
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -55,8 +66,8 @@ export default function Accounts() {
             <div className="p-6 flex-1">
               <div className="flex justify-between items-start mb-6">
                 <div className="flex items-center gap-4">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${account.color}`}>
-                    {account.icon}
+                  <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${account.color || 'bg-muted'}`}>
+                    {getIconForType(account.type)}
                   </div>
                   <div>
                     <h3 className="font-semibold text-lg">{account.name}</h3>
@@ -70,18 +81,13 @@ export default function Accounts() {
               
               <div>
                 <p className="text-sm text-muted-foreground mb-1">Current Balance</p>
-                <div className={`text-2xl font-bold ${account.balance < 0 ? 'text-destructive' : 'text-foreground'}`}>
-                  {account.balance < 0 ? '-' : ''}${Math.abs(account.balance).toLocaleString('en-US', {minimumFractionDigits: 2})}
+                <div className={`text-2xl font-bold ${Number(account.balance) < 0 ? 'text-destructive' : 'text-foreground'}`}>
+                  {Number(account.balance) < 0 ? '-' : ''}${Math.abs(Number(account.balance)).toLocaleString('en-US', {minimumFractionDigits: 2})}
                 </div>
-                {account.limit && (
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Limit: ${account.limit.toLocaleString()} • Available: ${(account.limit + account.balance).toLocaleString()}
-                  </p>
-                )}
               </div>
             </div>
             <div className="bg-muted/30 px-6 py-3 border-t text-xs text-muted-foreground flex justify-between items-center">
-              <span>Updated {account.lastUpdated}</span>
+              <span>Updated Just now</span>
               <button className="text-primary hover:underline font-medium">Sync Now</button>
             </div>
           </div>

@@ -1,68 +1,73 @@
-"use client";
-
 import { ArrowDownIcon, ArrowUpIcon, CreditCard, DollarSign } from "lucide-react";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+import { DashboardChart } from "@/components/DashboardChart";
+import { db } from "@/db";
+import { users, accounts, transactions, categories } from "@/db/schema";
+import { desc, eq, sum } from "drizzle-orm";
 
-const data = [
-  { name: "Jan", income: 4000, expenses: 2400 },
-  { name: "Feb", income: 3000, expenses: 1398 },
-  { name: "Mar", income: 2000, expenses: 9800 },
-  { name: "Apr", income: 2780, expenses: 3908 },
-  { name: "May", income: 1890, expenses: 4800 },
-  { name: "Jun", income: 2390, expenses: 3800 },
-];
+export default async function Dashboard() {
+  // Dalam skenario asli dengan Auth, kita ambil user.id yang sedang login
+  const currentUser = (await db.select().from(users).limit(1))[0];
 
-const recentTransactions = [
-  { id: 1, name: "Grocery Store", amount: -120.5, date: "2023-10-24", category: "Food" },
-  { id: 2, name: "Salary", amount: 4500.0, date: "2023-10-23", category: "Income" },
-  { id: 3, name: "Electric Bill", amount: -85.2, date: "2023-10-21", category: "Utilities" },
-  { id: 4, name: "Coffee Shop", amount: -12.0, date: "2023-10-20", category: "Food" },
-];
+  if (!currentUser) {
+    return <div>User tidak ditemukan. Silakan jalankan seeding.</div>;
+  }
 
-export default function Dashboard() {
+  // Ambil saldo total (sum dari balance semua akun)
+  const allAccounts = await db.select().from(accounts).where(eq(accounts.userId, currentUser.id));
+  const totalBalance = allAccounts.reduce((acc, account) => acc + Number(account.balance), 0);
+
+  // Ambil transaksi bulan ini
+  const allTransactions = await db.select({
+    id: transactions.id,
+    amount: transactions.amount,
+    description: transactions.description,
+    date: transactions.date,
+    categoryName: categories.name,
+  })
+  .from(transactions)
+  .leftJoin(categories, eq(transactions.categoryId, categories.id))
+  .where(eq(transactions.userId, currentUser.id))
+  .orderBy(desc(transactions.date))
+  .limit(10);
+
+  let totalIncome = 0;
+  let totalExpenses = 0;
+  
+  allTransactions.forEach(tx => {
+    const amt = Number(tx.amount);
+    if (amt > 0) totalIncome += amt;
+    else totalExpenses += Math.abs(amt);
+  });
+
+  // Siapkan data chart sederhana (berdasarkan bulan, disederhanakan untuk contoh ini)
+  const chartData = [
+    { name: "Prev", income: 0, expenses: 0 },
+    { name: "Current", income: totalIncome, expenses: totalExpenses },
+  ];
+
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground mt-1">
-          Welcome back! Here's an overview of your finances.
+          Selamat datang kembali, {currentUser.name}! Berikut ikhtisar keuangan Anda.
         </p>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">
-        <Card title="Total Balance" amount="$12,450.80" icon={<DollarSign />} trend="+2.5% from last month" trendUp />
-        <Card title="Total Income" amount="$8,450.00" icon={<ArrowUpIcon className="text-success" />} trend="+12% from last month" trendUp />
-        <Card title="Total Expenses" amount="$3,240.50" icon={<ArrowDownIcon className="text-destructive" />} trend="-4% from last month" trendUp={false} />
+        <Card title="Total Balance" amount={`$${totalBalance.toFixed(2)}`} icon={<DollarSign />} trend="+0.0% from last month" trendUp />
+        <Card title="Total Income" amount={`$${totalIncome.toFixed(2)}`} icon={<ArrowUpIcon className="text-success" />} trend="Current Month" trendUp />
+        <Card title="Total Expenses" amount={`$${totalExpenses.toFixed(2)}`} icon={<ArrowDownIcon className="text-destructive" />} trend="Current Month" trendUp={false} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-7">
         <div className="lg:col-span-4 rounded-xl border bg-card p-6 shadow-sm">
           <div className="mb-4">
             <h3 className="text-lg font-semibold">Financial Summary</h3>
-            <p className="text-sm text-muted-foreground">Income vs Expenses over time</p>
+            <p className="text-sm text-muted-foreground">Income vs Expenses</p>
           </div>
           <div className="h-[300px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--border)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fill: 'var(--muted-foreground)', fontSize: 12 }} tickFormatter={(value) => `$${value}`} />
-                <Tooltip
-                  cursor={{ fill: 'var(--muted)' }}
-                  contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
-                />
-                <Bar dataKey="income" fill="var(--primary)" radius={[4, 4, 0, 0]} name="Income" />
-                <Bar dataKey="expenses" fill="var(--destructive)" radius={[4, 4, 0, 0]} name="Expenses" />
-              </BarChart>
-            </ResponsiveContainer>
+            <DashboardChart data={chartData} />
           </div>
         </div>
 
@@ -70,26 +75,30 @@ export default function Dashboard() {
           <div className="mb-4 flex items-center justify-between">
             <div>
               <h3 className="text-lg font-semibold">Recent Transactions</h3>
-              <p className="text-sm text-muted-foreground">Your latest financial activities</p>
+              <p className="text-sm text-muted-foreground">Aktivitas keuangan terbaru Anda</p>
             </div>
           </div>
           <div className="space-y-4">
-            {recentTransactions.map((tx) => (
-              <div key={tx.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                    <CreditCard className="h-5 w-5 text-muted-foreground" />
+            {allTransactions.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">Belum ada transaksi.</p>
+            ) : (
+              allTransactions.slice(0, 5).map((tx) => (
+                <div key={tx.id} className="flex items-center justify-between border-b pb-4 last:border-0 last:pb-0">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
+                      <CreditCard className="h-5 w-5 text-muted-foreground" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium leading-none">{tx.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{tx.categoryName || "Uncategorized"} • {tx.date.toLocaleDateString()}</p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium leading-none">{tx.name}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{tx.category} • {tx.date}</p>
+                  <div className={`font-semibold ${Number(tx.amount) > 0 ? 'text-success' : ''}`}>
+                    {Number(tx.amount) > 0 ? '+' : ''}{Number(tx.amount) < 0 ? '-' : ''}${Math.abs(Number(tx.amount)).toFixed(2)}
                   </div>
                 </div>
-                <div className={`font-semibold ${tx.amount > 0 ? 'text-success' : ''}`}>
-                  {tx.amount > 0 ? '+' : ''}{tx.amount < 0 ? '-' : ''}${Math.abs(tx.amount).toFixed(2)}
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>

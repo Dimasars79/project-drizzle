@@ -1,17 +1,54 @@
-"use client";
+import { PieChart, Utensils, Home, Car, Film, HeartPulse, ShoppingBag, Plus, DollarSign } from "lucide-react";
+import { db } from "@/db";
+import { users, categories, transactions } from "@/db/schema";
+import { eq } from "drizzle-orm";
 
-import { PieChart, Utensils, Home, Car, Film, HeartPulse, ShoppingBag, Plus } from "lucide-react";
+export default async function Categories() {
+  const currentUser = (await db.select().from(users).limit(1))[0];
 
-const categoriesData = [
-  { id: 1, name: "Housing", icon: <Home className="h-5 w-5" />, color: "bg-blue-500", spent: 1500, budget: 1500, txCount: 2 },
-  { id: 2, name: "Food & Dining", icon: <Utensils className="h-5 w-5" />, color: "bg-orange-500", spent: 450, budget: 600, txCount: 24 },
-  { id: 3, name: "Transportation", icon: <Car className="h-5 w-5" />, color: "bg-purple-500", spent: 280, budget: 300, txCount: 12 },
-  { id: 4, name: "Entertainment", icon: <Film className="h-5 w-5" />, color: "bg-pink-500", spent: 120, budget: 200, txCount: 4 },
-  { id: 5, name: "Health", icon: <HeartPulse className="h-5 w-5" />, color: "bg-red-500", spent: 85, budget: 150, txCount: 3 },
-  { id: 6, name: "Shopping", icon: <ShoppingBag className="h-5 w-5" />, color: "bg-emerald-500", spent: 340, budget: 300, txCount: 8 },
-];
+  if (!currentUser) {
+    return <div>User tidak ditemukan. Silakan jalankan seeding.</div>;
+  }
 
-export default function Categories() {
+  // Ambil semua kategori user
+  const allCategories = await db.select().from(categories).where(eq(categories.userId, currentUser.id));
+  
+  // Ambil semua transaksi user (untuk menghitung pengeluaran per kategori)
+  const allTransactions = await db.select().from(transactions).where(eq(transactions.userId, currentUser.id));
+
+  const getIconForName = (iconName: string | null) => {
+    switch (iconName) {
+      case "Home": return <Home className="h-5 w-5" />;
+      case "Utensils": return <Utensils className="h-5 w-5" />;
+      case "Car": return <Car className="h-5 w-5" />;
+      case "Film": return <Film className="h-5 w-5" />;
+      case "HeartPulse": return <HeartPulse className="h-5 w-5" />;
+      case "ShoppingBag": return <ShoppingBag className="h-5 w-5" />;
+      case "DollarSign": return <DollarSign className="h-5 w-5" />;
+      default: return <PieChart className="h-5 w-5" />;
+    }
+  };
+
+  // Agregasi data (gabungkan kategori dengan transaksi)
+  const categoriesData = allCategories.map(cat => {
+    const catTransactions = allTransactions.filter(tx => tx.categoryId === cat.id);
+    const spent = catTransactions.reduce((acc, curr) => {
+      // Jika amount negatif (pengeluaran), jumlahkan nilai absolutnya
+      const amt = Number(curr.amount);
+      return amt < 0 ? acc + Math.abs(amt) : acc;
+    }, 0);
+
+    return {
+      id: cat.id,
+      name: cat.name,
+      icon: getIconForName(cat.icon),
+      color: cat.color || "bg-muted",
+      spent: spent,
+      budget: Number(cat.budget) || 0,
+      txCount: catTransactions.length
+    };
+  });
+
   return (
     <div className="space-y-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
@@ -29,8 +66,9 @@ export default function Categories() {
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {categoriesData.map((cat) => {
-          const percentSpent = Math.min((cat.spent / cat.budget) * 100, 100);
-          const isOverBudget = cat.spent > cat.budget;
+          // Cegah pembagian dengan 0
+          const percentSpent = cat.budget > 0 ? Math.min((cat.spent / cat.budget) * 100, 100) : (cat.spent > 0 ? 100 : 0);
+          const isOverBudget = cat.budget > 0 && cat.spent > cat.budget;
 
           return (
             <div key={cat.id} className="rounded-xl border bg-card p-6 shadow-sm hover:shadow-md transition-shadow relative overflow-hidden group">
@@ -48,8 +86,8 @@ export default function Categories() {
               
               <div className="space-y-2">
                 <div className="flex justify-between text-sm font-medium">
-                  <span className={isOverBudget ? 'text-destructive' : 'text-foreground'}>${cat.spent} spent</span>
-                  <span className="text-muted-foreground">${cat.budget}</span>
+                  <span className={isOverBudget ? 'text-destructive' : 'text-foreground'}>${cat.spent.toLocaleString('en-US', {minimumFractionDigits: 2})} spent</span>
+                  <span className="text-muted-foreground">${cat.budget.toLocaleString('en-US', {minimumFractionDigits: 2})} budget</span>
                 </div>
                 <div className="h-2.5 w-full rounded-full bg-muted overflow-hidden">
                   <div 
@@ -59,13 +97,19 @@ export default function Categories() {
                 </div>
                 {isOverBudget && (
                   <p className="text-xs text-destructive mt-1 font-medium text-right">
-                    Over budget by ${cat.spent - cat.budget}
+                    Over budget by ${(cat.spent - cat.budget).toLocaleString('en-US', {minimumFractionDigits: 2})}
                   </p>
                 )}
               </div>
             </div>
           );
         })}
+        
+        {categoriesData.length === 0 && (
+          <div className="col-span-full py-8 text-center text-muted-foreground">
+            Belum ada kategori yang dibuat.
+          </div>
+        )}
       </div>
 
       <div className="rounded-xl border bg-card p-8 shadow-sm text-center">

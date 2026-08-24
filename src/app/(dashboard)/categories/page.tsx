@@ -4,6 +4,7 @@ import { users, categories, transactions } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { AddCategoryModal } from "@/components/modals/AddCategoryModal";
 
 export default async function Categories() {
   const session = await getSession();
@@ -63,10 +64,7 @@ export default async function Categories() {
             Track your spending limits and budget by category.
           </p>
         </div>
-        <button className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors w-full sm:w-auto justify-center">
-          <Plus className="h-4 w-4" />
-          New Category
-        </button>
+        <AddCategoryModal />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

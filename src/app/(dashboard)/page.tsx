@@ -5,6 +5,7 @@ import { users, accounts, transactions, categories } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { AddTransactionModal } from "@/components/modals/AddTransactionModal";
 
 export default async function Dashboard() {
   const session = await getSession();
@@ -19,6 +20,10 @@ export default async function Dashboard() {
   // Ambil saldo total (sum dari balance semua akun)
   const allAccounts = await db.select().from(accounts).where(eq(accounts.userId, currentUser.id));
   const totalBalance = allAccounts.reduce((acc, account) => acc + Number(account.balance), 0);
+
+  // Ambil data untuk modal dropdown
+  const allAccountsRaw = allAccounts.map(a => ({ id: a.id, name: a.name }));
+  const allCategoriesRaw = await db.select({ id: categories.id, name: categories.name }).from(categories).where(eq(categories.userId, currentUser.id));
 
   // Ambil transaksi bulan ini
   const allTransactions = await db.select({
@@ -76,11 +81,12 @@ export default async function Dashboard() {
         </div>
 
         <div className="lg:col-span-3 rounded-xl border bg-card p-6 shadow-sm">
-          <div className="mb-4 flex items-center justify-between">
+          <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h3 className="text-lg font-semibold">Recent Transactions</h3>
               <p className="text-sm text-muted-foreground">Aktivitas keuangan terbaru Anda</p>
             </div>
+            <AddTransactionModal accounts={allAccountsRaw} categories={allCategoriesRaw} />
           </div>
           <div className="space-y-4">
             {allTransactions.length === 0 ? (

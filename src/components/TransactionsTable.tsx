@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Search, Filter, Download, Plus, MoreHorizontal } from "lucide-react";
+import { AddTransactionModal } from "./modals/AddTransactionModal";
 
 type Transaction = {
   id: string;
@@ -12,7 +13,18 @@ type Transaction = {
   amount: string;
 };
 
-export function TransactionsTable({ data }: { data: Transaction[] }) {
+type Account = { id: string; name: string };
+type Category = { id: string; name: string };
+
+export function TransactionsTable({ 
+  data, 
+  accounts, 
+  categories 
+}: { 
+  data: Transaction[],
+  accounts: Account[],
+  categories: Category[]
+}) {
   const [searchTerm, setSearchTerm] = useState("");
 
   const filteredTransactions = data.filter((tx) =>
@@ -34,10 +46,7 @@ export function TransactionsTable({ data }: { data: Transaction[] }) {
             <Download className="h-4 w-4" />
             Export
           </button>
-          <button className="flex items-center gap-2 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors">
-            <Plus className="h-4 w-4" />
-            Add Transaction
-          </button>
+          <AddTransactionModal accounts={accounts} categories={categories} />
         </div>
       </div>
 

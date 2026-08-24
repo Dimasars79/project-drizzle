@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { users, transactions, categories } from "@/db/schema";
+import { users, transactions, categories, accounts } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 import { TransactionsTable } from "@/components/TransactionsTable";
 import { getSession } from "@/lib/auth";
@@ -39,7 +39,15 @@ export default async function TransactionsPage() {
     amount: tx.amount,
   }));
 
+  // Ambil data dropdown
+  const allAccounts = await db.select({ id: accounts.id, name: accounts.name }).from(accounts).where(eq(accounts.userId, currentUser.id));
+  const allCategories = await db.select({ id: categories.id, name: categories.name }).from(categories).where(eq(categories.userId, currentUser.id));
+
   return (
-    <TransactionsTable data={formattedTransactions} />
+    <TransactionsTable 
+      data={formattedTransactions} 
+      accounts={allAccounts} 
+      categories={allCategories} 
+    />
   );
 }

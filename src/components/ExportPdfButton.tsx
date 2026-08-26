@@ -65,8 +65,8 @@ export function ExportPdfButton({ variant = "default", label = "Download PDF", i
       </button>
 
       {exportData && (
-        <div style={{ position: 'absolute', top: '-9999px', left: '-9999px' }}>
-          <div id="pdf-statement-template-shared">
+        <div style={{ position: 'absolute', top: '-9999px', left: '-9999px', width: '794px' }}>
+          <div id="pdf-statement-template-shared" style={{ width: '794px' }}>
             <TransactionStatement 
               userName={exportData.userName}
               userEmail={exportData.userEmail}

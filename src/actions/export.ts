@@ -21,9 +21,11 @@ export async function getExportData() {
     description: transactions.description,
     date: transactions.date,
     categoryName: categories.name,
+    accountName: accounts.name,
   })
   .from(transactions)
   .leftJoin(categories, eq(transactions.categoryId, categories.id))
+  .leftJoin(accounts, eq(transactions.accountId, accounts.id))
   .where(eq(transactions.userId, currentUser.id))
   .orderBy(desc(transactions.date));
 

@@ -1,4 +1,4 @@
-import { PieChart, Utensils, Home, Car, Film, HeartPulse, ShoppingBag, Plus, DollarSign } from "lucide-react";
+import { PieChart, Utensils, Home, Car, Film, HeartPulse, ShoppingBag, Plus, DollarSign, ShoppingCart, Coffee } from "lucide-react";
 import { db } from "@/db";
 import { users, categories, transactions } from "@/db/schema";
 import { eq } from "drizzle-orm";

@@ -120,7 +120,7 @@ export function TransactionsTable({
             </tbody>
           </table>
         </div>
-        <div className="p-4 border-t flex items-center justify-between text-sm text-muted-foreground">
+        <div className="p-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
           <div>Showing 1 to {filteredTransactions.length} of {data.length} entries</div>
           <div className="flex items-center gap-2">
             <button className="px-3 py-1 border rounded-md hover:bg-muted disabled:opacity-50" disabled>Previous</button>

@@ -1,8 +1,8 @@
-import { Sidebar } from "@/components/Sidebar";
 import { getSession } from "@/lib/auth";
 import { db } from "@/db";
 import { users } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { MobileSidebarWrapper } from "@/components/MobileSidebarWrapper";
 
 export default async function DashboardLayout({
   children,
@@ -18,11 +18,8 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-muted/30">
-      <Sidebar userName={userName} />
-      <main className="flex-1 overflow-y-auto p-8">
-        <div className="mx-auto max-w-6xl">{children}</div>
-      </main>
-    </div>
+    <MobileSidebarWrapper userName={userName}>
+      {children}
+    </MobileSidebarWrapper>
   );
 }

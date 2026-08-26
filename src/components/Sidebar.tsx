@@ -28,7 +28,7 @@ const navItems = [
 import { logoutUser } from "@/actions/auth";
 import { LogOut } from "lucide-react";
 
-export function Sidebar({ userName = "John Doe" }: { userName?: string }) {
+export function Sidebar({ userName = "John Doe", onNavigate }: { userName?: string, onNavigate?: () => void }) {
   const pathname = usePathname();
   
   // Ambil inisial nama
@@ -49,6 +49,7 @@ export function Sidebar({ userName = "John Doe" }: { userName?: string }) {
             <Link
               key={item.name}
               href={item.href}
+              onClick={onNavigate}
               className={cn(
                 "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all hover:bg-muted",
                 isActive ? "bg-primary text-primary-foreground hover:bg-primary/90" : "text-muted-foreground hover:text-foreground"
